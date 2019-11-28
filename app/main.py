@@ -125,7 +125,7 @@ def move():
     food = board['food']
     snakes = board['snakes']
 
-    orientation = 1
+    orientation = turn
     input = prepareObservations(you, snakes, food, orientation)
     prediction = model.predict(input)
     output = prediction[0]
