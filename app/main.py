@@ -4,6 +4,8 @@ import random
 import bottle
 
 from api import ping_response, start_response, move_response, end_response
+from policy import CustomPolicy
+from stable_baselines import PPO2
 
 @bottle.route('/')
 def index():
@@ -48,18 +50,87 @@ def start():
     return start_response(color, headType, tailType)
 
 
+BOARD_WIDTH = 11
+BOARD_HEIGHT = 11
+
+
+NUM_LAYERS = 6
+LAYER_WIDTH = 39
+LAYER_HEIGHT = 39
+
+model = PPO2.load('/snakes/model')
+
+def prepareObservations(you, snakes, food, orientation):
+  head = you['body'][0]
+  hx = head['x']
+  hy = head['y']
+  yourLength = len(you['body'])
+
+  observations = []
+  def assign(point, layer, value):
+    x = point['x']
+    y = point['y']
+    x = (x - hx) * (-1 if orientation & 1 != 0 else 1)
+    y = (x - hy) * (-1 if orientation & 2 != 0 else 1)
+    x += LAYER_WIDTH / 2
+    y += LAYER_HEIGHT / 2
+    if x > 0 and x < LAYER_WIDTH and y > 0 and y < LAYER_HEIGHT:
+      observations[ Math.floor(x*(LAYER_HEIGHT*NUM_LAYERS) + y*NUM_LAYERS + l)] = value
+
+    for snake in snakes:
+        body = snake['body']
+        assign(body[0], 0, snake['health'])
+        i = 0
+        for part in body:
+            i += 1
+            assign(part, 1, 1)
+            assign(part, 2, min(i, 255))
+
+        if snake['id'] != you['id']:
+            assign(body[0], 3, 1 if len(body) >= yourLength else 0)
+
+    for pellet in food:
+        assign(pellet, 4, 1)
+
+    for x in range(0, BOARD_WIDTH):
+        for y in range(0, BOARD_WIDTH):
+            assign({ x, y }, 5, 1)
+
+  return observations
+
+
+up = 'up'
+down = 'down'
+left = 'left'
+right = 'right'
+moves = [up, down, left, right]
+
+def getDirection(index, orientation):
+  action = moves[index]
+  if (orientation & 1 != 0) and (action == left or action == right):
+      action = right if action == left else left
+  if (orientation & 2 != 0) and (action == up or action == down):
+      action = up if action == down else down
+
+  return action
+
+
 @bottle.post('/move')
 def move():
     data = bottle.request.json
 
-    """
-    TODO: Using the data from the endpoint request object, your
-            snake AI must choose a direction to move in.
-    """
-    print(json.dumps(data))
+    turn = data['turn']
+    you = data['you']
+    board = data['board']
+    food = board['food']
+    snakes = board['snakes']
 
-    directions = ['up', 'down', 'left', 'right']
-    direction = random.choice(directions)
+    orientation = 1
+    input = prepareObservations(you, snakes, food, orientation)
+    prediction = model.predict(input)
+    output = prediction[0]
+
+    direction = getDirection(output, orientation)
 
     return move_response(direction)
 
