@@ -3,8 +3,8 @@ import os
 import random
 import bottle
 
-from api import ping_response, start_response, move_response, end_response
-from policy import CustomPolicy
+from .api import ping_response, start_response, move_response, end_response
+from gym_battlesnake.custompolicy import CustomPolicy
 from stable_baselines import PPO2
 
 @bottle.route('/')
@@ -58,7 +58,7 @@ NUM_LAYERS = 6
 LAYER_WIDTH = 39
 LAYER_HEIGHT = 39
 
-model = PPO2.load('/snakes/model')
+model = PPO2.load('/snake/model.pkl')
 
 def prepareObservations(you, snakes, food, orientation):
   head = you['body'][0]
