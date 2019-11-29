@@ -135,7 +135,7 @@ def move():
 
     observations = prepareObservations(you, snakes, food, orientation)
 
-    input = np.reshape(observations, (1, LAYER_WIDTH, LAYER_HEIGHT, NUM_LAYERS))
+    input = np.reshape(observations, (16, LAYER_WIDTH, LAYER_HEIGHT, NUM_LAYERS))
     prediction = model.predict(input, deterministic=True)
     output = np.asarray(prediction[0], dtype=np.uint8)[0]
 
