@@ -72,7 +72,7 @@ def prepareObservations(you, snakes, food, orientation):
   hy = head['y']
   yourLength = len(you['body'])
 
-  observations = []
+  observations = [0] * LAYER_HEIGHT * LAYER_WIDTH * NUM_LAYERS
   def assign(point, layer, value):
       x = point['x']
       y = point['y']
