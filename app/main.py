@@ -81,7 +81,7 @@ def prepareObservations(you, snakes, food, orientation):
       x += LAYER_WIDTH / 2
       y += LAYER_HEIGHT / 2
       if x > 0 and x < LAYER_WIDTH and y > 0 and y < LAYER_HEIGHT:
-          observations[ math.floor(x*(LAYER_HEIGHT*NUM_LAYERS) + y*NUM_LAYERS + l)] = value
+          observations[ math.floor(x*(LAYER_HEIGHT*NUM_LAYERS) + y*NUM_LAYERS + layer)] = value
 
   for snake in snakes:
       body = snake['body']
@@ -135,9 +135,9 @@ def move():
 
     observations = prepareObservations(you, snakes, food, orientation)
 
-    input = np.reshape(observations, (1, LAYER_WIDTH, LAYER_HEIGHT, NUM_LAYERS))(0)
+    input = np.reshape(observations, (1, LAYER_WIDTH, LAYER_HEIGHT, NUM_LAYERS))
     prediction = model.predict(input, deterministic=True)
-    output = prediction[0]
+    output = prediction[0][0]
 
     direction = getDirection(output, orientation)
 
