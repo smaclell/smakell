@@ -2,10 +2,15 @@ import json
 import os
 import random
 import bottle
+from gym import spaces
+import numpy as np
 
 from .api import ping_response, start_response, move_response, end_response
 from gym_battlesnake.custompolicy import CustomPolicy
 from stable_baselines import PPO2
+
+# self.action_space = spaces.Discrete(4)
+# self.observation_space = spaces.Box(low=0,high=255, shape=(LAYER_WIDTH, LAYER_HEIGHT, NUM_LAYERS), dtype=np.uint8)
 
 @bottle.route('/')
 def index():
@@ -126,8 +131,9 @@ def move():
     snakes = board['snakes']
 
     orientation = turn
-    input = prepareObservations(you, snakes, food, orientation)
-    prediction = model.predict(input)
+    obersvations = prepareObservations(you, snakes, food, orientation)
+    input = np.ctypeslib.as_array(np.ctypeslib.as_ctypes(obersvations), shape=(1, LAYER_WIDTH, LAYER_HEIGHT, NUM_LAYERS))(0)
+    prediction = model.predict(input, deterministic=True)
     output = prediction[0]
 
     direction = getDirection(output, orientation)
