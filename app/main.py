@@ -59,7 +59,7 @@ def start():
 BOARD_WIDTH = 11
 BOARD_HEIGHT = 11
 
-
+NUM_ENVS = 16
 NUM_LAYERS = 6
 LAYER_WIDTH = 39
 LAYER_HEIGHT = 39
@@ -72,7 +72,7 @@ def prepareObservations(you, snakes, food, orientation):
   hy = head['y']
   yourLength = len(you['body'])
 
-  observations = [0] * LAYER_HEIGHT * LAYER_WIDTH * NUM_LAYERS
+  observations = [0] * NUM_ENVS * LAYER_HEIGHT * LAYER_WIDTH * NUM_LAYERS
   def assign(point, layer, value):
       x = point['x']
       y = point['y']
@@ -135,7 +135,7 @@ def move():
 
     observations = prepareObservations(you, snakes, food, orientation)
 
-    input = np.reshape(observations, (16, LAYER_WIDTH, LAYER_HEIGHT, NUM_LAYERS))
+    input = np.reshape(observations, (NUM_ENVS, LAYER_WIDTH, LAYER_HEIGHT, NUM_LAYERS))
     prediction = model.predict(input, deterministic=True)
     output = np.asarray(prediction[0], dtype=np.uint8)[0]
 
