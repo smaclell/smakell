@@ -137,7 +137,7 @@ def move():
 
     input = np.reshape(observations, (1, LAYER_WIDTH, LAYER_HEIGHT, NUM_LAYERS))
     prediction = model.predict(input, deterministic=True)
-    output = prediction[0][0]
+    output = np.asarray(prediction[0], dtype=np.uint8)[0]
 
     direction = getDirection(output, orientation)
 
