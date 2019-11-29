@@ -131,7 +131,7 @@ def move():
     food = board['food']
     snakes = board['snakes']
 
-    orientation = turn
+    orientation = 0
 
     observations = prepareObservations(you, snakes, food, orientation)
 
