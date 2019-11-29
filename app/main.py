@@ -4,6 +4,7 @@ import random
 import bottle
 from gym import spaces
 import numpy as np
+import math
 
 from .api import ping_response, start_response, move_response, end_response
 from gym_battlesnake.custompolicy import CustomPolicy
@@ -80,7 +81,7 @@ def prepareObservations(you, snakes, food, orientation):
       x += LAYER_WIDTH / 2
       y += LAYER_HEIGHT / 2
       if x > 0 and x < LAYER_WIDTH and y > 0 and y < LAYER_HEIGHT:
-          observations[ Math.floor(x*(LAYER_HEIGHT*NUM_LAYERS) + y*NUM_LAYERS + l)] = value
+          observations[ math.floor(x*(LAYER_HEIGHT*NUM_LAYERS) + y*NUM_LAYERS + l)] = value
 
   for snake in snakes:
       body = snake['body']
