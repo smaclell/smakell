@@ -73,33 +73,33 @@ def prepareObservations(you, snakes, food, orientation):
 
   observations = []
   def assign(point, layer, value):
-    x = point['x']
-    y = point['y']
-    x = (x - hx) * (-1 if orientation & 1 != 0 else 1)
-    y = (x - hy) * (-1 if orientation & 2 != 0 else 1)
-    x += LAYER_WIDTH / 2
-    y += LAYER_HEIGHT / 2
-    if x > 0 and x < LAYER_WIDTH and y > 0 and y < LAYER_HEIGHT:
-      observations[ Math.floor(x*(LAYER_HEIGHT*NUM_LAYERS) + y*NUM_LAYERS + l)] = value
+      x = point['x']
+      y = point['y']
+      x = (x - hx) * (-1 if orientation & 1 != 0 else 1)
+      y = (x - hy) * (-1 if orientation & 2 != 0 else 1)
+      x += LAYER_WIDTH / 2
+      y += LAYER_HEIGHT / 2
+      if x > 0 and x < LAYER_WIDTH and y > 0 and y < LAYER_HEIGHT:
+          observations[ Math.floor(x*(LAYER_HEIGHT*NUM_LAYERS) + y*NUM_LAYERS + l)] = value
 
-    for snake in snakes:
-        body = snake['body']
-        assign(body[0], 0, snake['health'])
-        i = 0
-        for part in body:
-            i += 1
-            assign(part, 1, 1)
-            assign(part, 2, min(i, 255))
+  for snake in snakes:
+      body = snake['body']
+      assign(body[0], 0, snake['health'])
+      i = 0
+      for part in body:
+          i += 1
+          assign(part, 1, 1)
+          assign(part, 2, min(i, 255))
 
-        if snake['id'] != you['id']:
-            assign(body[0], 3, 1 if len(body) >= yourLength else 0)
+      if snake['id'] != you['id']:
+          assign(body[0], 3, 1 if len(body) >= yourLength else 0)
 
-    for pellet in food:
-        assign(pellet, 4, 1)
+  for pellet in food:
+      assign(pellet, 4, 1)
 
-    for x in range(0, BOARD_WIDTH):
-        for y in range(0, BOARD_WIDTH):
-            assign({ x, y }, 5, 1)
+  for x in range(0, BOARD_WIDTH):
+      for y in range(0, BOARD_WIDTH):
+          assign({ 'x': x, 'y': y }, 5, 1)
 
   return observations
 
@@ -131,8 +131,10 @@ def move():
     snakes = board['snakes']
 
     orientation = turn
-    obersvations = prepareObservations(you, snakes, food, orientation)
-    input = np.ctypeslib.as_array(np.ctypeslib.as_ctypes(obersvations), shape=(1, LAYER_WIDTH, LAYER_HEIGHT, NUM_LAYERS))(0)
+
+    observations = prepareObservations(you, snakes, food, orientation)
+
+    input = np.reshape(observations, (1, LAYER_WIDTH, LAYER_HEIGHT, NUM_LAYERS))(0)
     prediction = model.predict(input, deterministic=True)
     output = prediction[0]
 
