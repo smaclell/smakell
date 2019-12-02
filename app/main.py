@@ -42,13 +42,6 @@ def ping():
 def start():
     data = bottle.request.json
 
-    """
-    TODO: If you intend to have a stateful snake AI,
-            initialize your snake state here using the
-            request's data if necessary.
-    """
-    print(json.dumps(data))
-
     color = "#56EEF4"
     headType = 'silly'
     tailType = 'sharp'
@@ -141,18 +134,14 @@ def move():
 
     direction = getDirection(output, orientation)
 
+    print(f"{you['id']} - turn {turn} {direction}")
+
     return move_response(direction)
 
 
 @bottle.post('/end')
 def end():
     data = bottle.request.json
-
-    """
-    TODO: If your snake AI was stateful,
-        clean up any stateful objects here.
-    """
-    print(json.dumps(data))
 
     return end_response()
 
